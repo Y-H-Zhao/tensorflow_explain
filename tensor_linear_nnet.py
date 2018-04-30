@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Created on Mon Apr 30 10:23:52 2017
+
 @author: ZYH
 """
 import tensorflow as tf
@@ -14,10 +15,15 @@ inputX=np.random.rand(3000,1) #随机数
 noise=np.random.normal(0,0.05,inputX.shape) #扰动
 outputY=inputX*4+1+noise
 
-#这是第一层 4个隐藏结点
+#这是第一层 4个隐藏结点 其实完全没有必要，这四个是完全相同的 这是简单的线性回归 不涉及神经网络
 #因为weight 和 bias 是我们需要不断迭代去优化的目标，所以定义为变量：
+
 weight1=tf.Variable(np.random.rand(inputX.shape[1],4))
 bias1=tf.Variable(np.random.rand(inputX.shape[1],4))
+'''
+weight1=tf.Variable(np.random.rand(1,1))
+bias1=tf.Variable(np.random.rand(1,1))
+'''
 #因为x是输入，而后面计算流图中还要运算，所以使用占位符 在会话中feed
 x=tf.placeholder(tf.float64,[None,1])
 #y1_是基于以上的张量计算的输出
@@ -58,6 +64,11 @@ print("--------结果-----------")
 #由于有y1_是图中最后计算出来的结果变量  所以模型保存在y1_中
 x_data=np.matrix([[1.],[2.],[3.]])
 print(sess.run(y1_,feed_dict={x:x_data})) 
+'''
+这里就是简单的线性模型，数据是成批输入的。
+涉及神经网络，中间神经元的维度应该是输入节点维度*隐层节点维度，而不是inputX.shape[1],4 而是1*4
+当训练时，输入应该是分批 或者是一个一个输入。
+'''
 
 '''
 加入两层 也是同样道理的
