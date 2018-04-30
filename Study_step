@@ -2,5 +2,6 @@
 2.tensor_matrix.py
 3.example_linear.py
 4.tensor_linear_nnet.py
-5.tensor_graph_tensor_session.py
-6.Tensorflow_study.py
+5.Tensorflow_study
+6.tensor_graph_tensor_session.py
+7.Variable_and_Tensor.py 
