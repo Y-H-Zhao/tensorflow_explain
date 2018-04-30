@@ -5,6 +5,7 @@ Created on Mon Apr 30 10:23:52 2017
 @author: ZYH
 """
 import tensorflow as tf
+
 import numpy as np
 
 '''
@@ -24,6 +25,8 @@ x=tf.placeholder(tf.float64,[None,1])
 y1_=tf.matmul(x,weight1)+bias1
 '''
 如果是线性拟合，直接隐藏层节点为1就可以了，其他任何形式的函数都可以这样拟合，反正变量就是我们需要拟合的参数
+weight1=tf.Variable(np.random.rand(1.0))
+bias1=tf.Variable(np.random.rand(1.0))
 '''
 
 #定义优化目标
