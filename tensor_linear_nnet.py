@@ -22,13 +22,16 @@ bias1=tf.Variable(np.random.rand(inputX.shape[1],4))
 x=tf.placeholder(tf.float64,[None,1])
 #y1_是基于以上的张量计算的输出
 y1_=tf.matmul(x,weight1)+bias1
+'''
+如果是线性拟合，直接隐藏层节点为1就可以了，其他任何形式的函数都可以这样拟合，反正变量就是我们需要拟合的参数
+'''
 
 #定义优化目标
 #y是输出对比，在优化流图中需要使用，所以占位符 ，在会话中feed
 y=tf.placeholder(tf.float64,[None,1])
 #优化目标 reduction_indices=1按列求均值 reduction_indices=0按行 reduction_indices=None 所有
-#loss=tf.reduce_mean(tf.reduce_sum(tf.square(y1_-y)))
-loss=tf.reduce_mean(tf.square(y1_-y),reduction_indices=0)
+#loss=tf.reduce_sum(tf.pow((y1_-y),2))  #最小二乘
+loss=tf.reduce_mean(tf.square(y1_-y),reduction_indices=0) #均方误差
 #定义训练模型
 trainmodel=tf.train.GradientDescentOptimizer(0.25).minimize(loss) #梯度下降
 
