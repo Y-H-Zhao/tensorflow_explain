@@ -1,0 +1,15 @@
+TensorFlow 计算模型----计算图
+1.TensorFlow 中所有计算都会被转化为计算图上的节点。而节点之间的边描述了计算之间的依赖关系：沿着边输入，输出。
+2.计算图的使用，Tensorflow程序一般可以分为两个阶段，第一个阶段需要定义计算图中所有的计算；第二个阶段为执行计算。具体使用见tensor_graph_tensor_session.py
+
+TensorFlow 数据模型----张量
+1.张量：多维数组。
+2.张量在tensorflow中实现不是直接采用数组的形式，它只是对Tensorflow中运算结果的引用，在张量中并没有保存真正的数字，它保存的是如何得到这些数字的计算过程，所以输出也不会得到数字。而是张量的结构，name,shape,type。
+name是张量的唯一标识，同样给出如何计算，是第几个结果。例如“add:0”表示为计算节点add的第一个结果。
+shape描述维度信息（2，）一维数组，长度为2。
+type是数据类型。
+3.张量的使用。具体使用见tensor_graph_tensor_session.py
+
+TensorFlow 运行模型----会话
+前面介绍组织数据和运算，下面来执行这些定义好的数据和运算。
+具体使用见tensor_graph_tensor_session.py
