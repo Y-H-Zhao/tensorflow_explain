@@ -6,3 +6,4 @@
 6.tensor_graph_tensor_session.py
 7.Variable_and_Tensor.py 
 8.nnet.py
+9.learning_rate.py
