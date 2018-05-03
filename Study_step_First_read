@@ -9,3 +9,4 @@
 9.learning_rate.py
 10.fit_over.py
 11.moving_average.py 
+12.mnist_train.py 
