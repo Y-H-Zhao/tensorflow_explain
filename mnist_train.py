@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed May  2 20:46:22 2018
+Created on Wed May  2 20:46:22 2017
 
 @author: ZYH
 """
@@ -141,7 +141,7 @@ def train(mnist):
         
 #主程序入口
 def main(argv=None):
-    mnist = input_data.read_data_sets("../datasets/MNIST_data", one_hot=True)
+    mnist = input_data.read_data_sets("datasets/MNIST_data", one_hot=True)
     train(mnist)
 #tensorflow提供一个主程序，调用上面的main函数
 if __name__=='__main__':
