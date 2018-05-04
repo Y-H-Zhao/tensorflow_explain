@@ -21,6 +21,7 @@ regularization_rate=0.0001 #正则化系数
 training_step=5000 #训练轮数
 moving_average_decay=0.99 #移动平均衰减率
 
+
 #定义前向传播函数，Relu激活函数，支持传入参数移动平均的类(这个应该在训练过程中想到构造)
 def inference(input_tensor,avg_class,weights1,biases1,
               weights2,biases2):
@@ -56,6 +57,7 @@ def train(mnist):
     #这里avg_class=None
     y=inference(x,None,weights1,biases1,weights2,biases2)
     
+    #注意这里先得到当前参数下的前向传播的值，下面再进行移动平均的操作。
     #下面计算avg_class存在的前向传播结果
     #定义存储训练次数的变量，此变量不适用移动平均，不进入训练trainable=False
     global_step=tf.Variable(0,trainable=False)
