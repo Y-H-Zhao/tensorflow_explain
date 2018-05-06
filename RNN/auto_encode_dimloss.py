@@ -8,28 +8,21 @@ Created on Sun Apr 22 16:31:48 2018
 import tensorflow as tf
 import pandas as pd
 #import math
-from sklearn import datasets
-#from sklearn.manifold import TSNE
 import numpy as np
-#import matplotlib.pyplot as plt
-#from matplotlib import cm
-#from mpl_toolkits.mplot3d import Axes3D
-#import seaborn as sns
 
-#iris_dataset = datasets.load_iris() 鸢尾花数据
 
 f=open('sales_data08.csv')
-df=pd.read_csv(f)     #读入股票数据
+df=pd.read_csv(f)     #读入销售数据
 #data=df.iloc[:,:13].values  #取第1-13列
-features=df.iloc[:,:13].values #取第1-13列
+original_features=df.iloc[:,:13].values #取第1-13列
 sales=df.iloc[:,13].values  #预测数据
+#标准化
+mean=np.mean(original_features,axis=0)
+std=np.std(original_features,axis=0)
+features=(original_features-mean)/std  #标准化
+#sales=(original_sales-np.mean(original_sales,axis=0))/np.std(original_sales,axis=0)
 n=len(features)
-'''
-# Mix the data before training
-n = len(iris_dataset.data)
-random_idx = np.random.permutation(n)
-features= iris_dataset.data[random_idx]
-'''
+
 
 def batch_generator(features, batch_size=100, n_epochs=10):
     """
@@ -50,9 +43,11 @@ def batch_generator(features, batch_size=100, n_epochs=10):
 
 # Auto Encoder
 class TF_AutoEncoder:
-    def __init__(self, features,dtype=tf.float32):
+    def __init__(self, features,lr=0.01, steps=100, dtype=tf.float32):
         self.features = features
         self.dtype = dtype
+        self.steps = steps
+        self.lr=lr
 
         self.encoder = dict()
 
@@ -72,30 +67,38 @@ class TF_AutoEncoder:
 
             # Encoder part
             encoding = tf.nn.sigmoid(tf.add(tf.matmul(X, encoder_weights), encoder_bias))
+            #encoding = tf.nn.relu(tf.add(tf.matmul(X, encoder_weights), encoder_bias))
 
             # Decoder part
             predicted_x = tf.nn.sigmoid(tf.add(tf.matmul(encoding, decoder_weights), decoder_bias))
 
             # Define the cost function and optimizer to minimize squared error
-            cost = tf.reduce_mean(tf.pow(tf.subtract(predicted_x, X), 2))
-            optimizer = tf.train.AdamOptimizer().minimize(cost)
+            cost = tf.losses.mean_squared_error(labels=X, predictions=predicted_x)
+            #cost = tf.reduce_mean(tf.pow(tf.subtract(predicted_x, X), 2))
+            optimizer = tf.train.AdamOptimizer(self.lr).minimize(cost)
 
         with tf.Session(graph=graph) as session:
             # Initialize global variables
             session.run(tf.global_variables_initializer())
 
-            for batch_x in batch_generator(self.features):
-                self.encoder['weights'], self.encoder['bias'], _ = session.run([encoder_weights, encoder_bias, optimizer],
-                                                                            feed_dict={X: batch_x})
+            for i in range(self.steps):
+                for batch_x in batch_generator(self.features):
+                    cost_, _ = session.run([cost, optimizer],feed_dict={X: batch_x})
+                if i % 10==0:
+                    print("均方误差为：",cost_)
+                #self.encoder['weights'], self.encoder['bias'], _ = session.run([encoder_weights, encoder_bias, optimizer],feed_dict={X: batch_x})                                                           
+            self.encoding_=session.run(encoding,feed_dict={X:self.features})
 
     def reduce(self):
-        return np.add(np.matmul(self.features, self.encoder['weights']), self.encoder['bias'])
+        #return np.add(np.matmul(self.features, self.encoder['weights']), self.encoder['bias'])
+        return self.encoding_
+
     
 
 
 
 # Create an instance and encode
-tf_ae = TF_AutoEncoder(features)
+tf_ae = TF_AutoEncoder(features,steps=50)
 tf_ae.fit(n_dimensions=6)
 auto_encoded = tf_ae.reduce()
 #print(auto_encoded)
@@ -103,4 +106,6 @@ auto_encoded = tf_ae.reduce()
 dem_loss_sales=np.c_[auto_encoded,sales]
 
 dem_loss_sales_data=pd.DataFrame(dem_loss_sales)
-dem_loss_sales_data.to_csv('dem_loss_sales.csv',index=False)
+dem_loss_sales_data.to_csv('dem_loss_sales_sig.csv',index=False)
+
+
