@@ -9,8 +9,6 @@ import numpy as np
 #import matplotlib.pyplot as plt
 import tensorflow as tf
 import os
-import matplotlib.pyplot as plt
-#from tensorflow.contrib import rnn
 #参数设置
 input_size=6 #6个影响因子
 output_size=1
@@ -20,8 +18,8 @@ model_save_path="model_test/"
 model_name="model.ckpt"
 #超参数设置
 Option_design=input("是否自己设置超参数(y/n):")
-out=True
-while out==True:
+out=False
+while out==False:
     if Option_design=='N' or Option_design =='n':
         rnn_unit=18   #隐层数量
         lr_base=0.1
@@ -30,7 +28,7 @@ while out==True:
         input_keep_prob=0.8
         output_keep_prob=0.8
         train_steps=2000
-        out=False
+        out=True
     elif Option_design=='Y' or Option_design =='y':
         rnn_unit=int(input("设置隐藏层节点数："))
         lr_base=float(input("设置基础学习率："))
@@ -39,13 +37,25 @@ while out==True:
         input_keep_prob=float(input("设置输入层dropout系数："))
         output_keep_prob=float(input("设置输出层dropout系数："))
         train_steps=int(input("设置训练轮数："))
-        out=False
+        out=True
     else:
         Option_design=input("输入无效，请选择是否自己设置超参数(y/n):")
 variable_sco=input("设置变量空间(例如：lstm)，可重复训练：")
+'''
+BasicRNNCell/BasicLSTMCell/GRUCell/RNNCell/LSTMCell
+'''
+Select_Function=input("请输入数字选择RNN结构(1:BasicLSTMCell -- 2:GRUCell): ")
+S_out=False
+while S_out==False:
+    if Select_Function=='1' or Select_Function=='2':
+        S_out=True
+    else:
+        Select_Function=input("选择无效，请输入数字选择RNN结构(1:BasicLSTMCell -- 2:GRUCell): ")
+    
+    
 print("----------训练即将开始-------------")
 #读取数据
-f=open('dem_loss_sales.csv') #降维后数据
+f=open('dem_loss_sales_sig.csv') #降维后数据
 df=pd.read_csv(f)     #读入股票数据
 #data=df.iloc[:,:13].values  #取第1-13列
 data=df.values #全部数据
@@ -75,7 +85,7 @@ def get_train_data(train_begin=0,train_end=19200):
     batch_index.append((len(normalized_train_data)//time_step))
     return batch_index,train_x,train_y,train_num 
 #batch_size=100,time_step=8,
-
+_,train_x,_,_ =get_train_data()
 
 #获取验证集
 #time_step=8,
@@ -124,7 +134,13 @@ def lstm(X,istrain):
             "w_out",[rnn_unit,1],initializer=tf.truncated_normal_initializer(stddev=0.1))
         b_out=tf.get_variable("b_out",[1],initializer=tf.constant_initializer(0.0))
     '''
-    cell=tf.nn.rnn_cell.BasicLSTMCell(rnn_unit)
+    if Select_Function=='1':
+        cell=tf.nn.rnn_cell.BasicLSTMCell(rnn_unit)
+    elif Select_Function=='2':
+        cell=tf.nn.rnn_cell.GRUCell(rnn_unit)
+    else:
+        ex = Exception("选择方法有误！请重新运行程序！")
+        raise ex
     if istrain==True:
         cell=tf.nn.rnn_cell.DropoutWrapper(cell, input_keep_prob,output_keep_prob)
     else:
@@ -192,7 +208,6 @@ loss = tf.losses.mean_squared_error(labels=y, predictions=predictions)
 #正确的标签
 #loss=tf.reduce_mean(tf.square(tf.reshape(predictions,[-1])-tf.reshape(y, [-1])))
 
-
 #设置学习率
 learning_rate = tf.train.exponential_decay(
         lr_base,
@@ -225,8 +240,8 @@ with tf.Session() as sess:
                 saver.save(sess,os.path.join(model_save_path,model_name))
     print("The train has finished")
     #saver.save(sess,'model_save3\\modle.ckpt')
-    
-#最后定义一个测试函数--完毕
+  
+#定义测试函数
 def run_test(sess, test_x, test_y):
     # 将测试数据以数据集的方式提供给计算图。
     ds = tf.data.Dataset.from_tensor_slices(test_x)
@@ -266,3 +281,4 @@ with tf.Session() as sess:
     saver.restore(sess, module_file)
     test_mean,test_std,test_x,test_y=get_test_data(test_begin=21600)
     run_test(sess,test_x,test_y)
+
