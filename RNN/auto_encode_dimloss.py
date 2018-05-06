@@ -21,6 +21,7 @@ mean=np.mean(original_features,axis=0)
 std=np.std(original_features,axis=0)
 features=(original_features-mean)/std  #标准化
 #sales=(original_sales-np.mean(original_sales,axis=0))/np.std(original_sales,axis=0)
+#此处可以标准化，相应在lstm预测中省去标准化过过程
 n=len(features)
 
 
